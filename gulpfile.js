@@ -7,8 +7,8 @@ const browserify = require('browserify');
 const source = require('vinyl-source-stream');
 
 const destDir = 'build';
-const stylesDir = 'src/assets/styles';
-const scriptsDir = 'src/assets/scripts';
+const stylesDir = 'src/styles';
+const imagesDir = 'src/images';
 
 gulp.task('html', () => {
   gulp.src('src/**/*.html')
@@ -25,6 +25,12 @@ gulp.task('sass', () => {
   .pipe(browserSync.stream());
 });
 
+gulp.task('images', () => {
+  gulp.src(`${imagesDir}/**/*.{jpg,jpeg,png,svg}`)
+  .pipe(plumber())
+  .pipe(gulp.dest(`${destDir}/images`))
+});
+
 gulp.task('serve', () => {
   browserSync.init({
     server: {
@@ -38,4 +44,4 @@ gulp.task('watch', () => {
   gulp.watch(`${stylesDir}/**/*.scss`, ['sass']);
 });
 
-gulp.task('default', ['html', 'sass', 'serve', 'watch']);
+gulp.task('default', ['html', 'images', 'sass', 'serve', 'watch']);
