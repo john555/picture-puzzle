@@ -29,7 +29,8 @@ gulp.task('scss', () => {
 gulp.task('js', () => {
   gulp.src(`${scriptsDir}/**/*.js`)
   .pipe(plumber())
-  .pipe(gulp.dest(`${destDir}/js`));
+  .pipe(gulp.dest(`${destDir}/js`))
+  .pipe(browserSync.stream());
 });
 
 gulp.task('images', () => {
