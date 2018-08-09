@@ -9,6 +9,7 @@ const source = require('vinyl-source-stream');
 const destDir = 'build';
 const stylesDir = 'src/styles';
 const imagesDir = 'src/images';
+const scriptsDir = 'src/js';
 
 gulp.task('html', () => {
   gulp.src('src/**/*.html')
@@ -23,6 +24,12 @@ gulp.task('sass', () => {
   .pipe(gulp.dest(`${destDir}/styles`))
   .pipe(uglifyCss())
   .pipe(browserSync.stream());
+});
+
+gulp.task('js', () => {
+  gulp.src(`${scriptsDir}/**/*.js`)
+  .pipe(plumber())
+  .pipe(gulp.dest(`${destDir}/js`));
 });
 
 gulp.task('images', () => {
@@ -42,6 +49,7 @@ gulp.task('serve', () => {
 gulp.task('watch', () => {
   gulp.watch('src/**/*.html', ['html']);
   gulp.watch(`${stylesDir}/**/*.scss`, ['sass']);
+  gulp.watch(`${scriptsDir}/**/*.js`, ['js']);
 });
 
-gulp.task('default', ['html', 'images', 'sass', 'serve', 'watch']);
+gulp.task('default', ['html', 'images', 'sass', 'js', 'serve', 'watch']);
