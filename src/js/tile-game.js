@@ -2,11 +2,13 @@
 
 (function(global){
   const tiles = [];
+  const duration = 200;
 
   let options = {
     tileSize: 120,
     rows: 4,
     columns: 4,
+    dificulty: 1,
   };
 
   let stage;
@@ -22,7 +24,7 @@
 
     createTiles();
     renderTiles();
-
+    shuffleTiles();
   };
 
   function createStage() {
@@ -38,7 +40,6 @@
     for (let y = 0; y < options.rows; y++) {
       for (let x = 0; x < options.columns; x++) {
         const tileElement = document.createElement('div');
-
         const left = x * options.tileSize;
         const top = y * options.tileSize;
         const isEmpty = order === (options.rows * options.columns - 1);
@@ -49,7 +50,7 @@
         tileElement.style.left = '0';
         tileElement.style.top = '0';
         tileElement.style.transform = `translate(${left}px, ${top}px)`;
-        tileElement.style.transition = 'transform 200ms linear';
+        tileElement.style.transition = `transform ${duration}ms linear`;
 
         
         if (!isEmpty) {
@@ -68,9 +69,7 @@
         };
 
         bindEvents(tile)
-
         tiles.push(tile);
-
         order++;
       }
     } 
@@ -85,36 +84,43 @@
   }
 
   function moveTile(tile) {
-    const topTile = findTileInPosition(tile.x, tile.y - 1);
-    const rightTile = findTileInPosition(tile.x + 1, tile.y);
-    const bottomTile = findTileInPosition(tile.x, tile.y + 1);
-    const leftTile = findTileInPosition(tile.x - 1, tile.y);
-    
-    const emptyTile = findEmptyTile([topTile, rightTile, bottomTile, leftTile]);
+    const tileCollection = findNeighbouringTiles(tile);
+    const emptyTile = findEmptyTile(tileCollection);
 
     if (!emptyTile) {
       return;
     }
   
-    const tileTransform = `translate(${emptyTile.x * options.tileSize}px, ${emptyTile.y * options.tileSize}px)`;
-    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`
-    tile.tileElement.style.transform = tileTransform;
-    emptyTile.tileElement.style.transform = emptyTileTransform;
-
     swapTiles(tile, emptyTile);
   }
 
-  function findEmptyTile (t) {
-    return t.filter(tile => (tile && tile.isEmpty) === true)[0];
+  function findNeighbouringTiles(tile) {
+    const topTile = findTileInPosition(tile.x, tile.y - 1);
+    const rightTile = findTileInPosition(tile.x + 1, tile.y);
+    const bottomTile = findTileInPosition(tile.x, tile.y + 1);
+    const leftTile = findTileInPosition(tile.x - 1, tile.y);
+
+    return [topTile, rightTile, bottomTile, leftTile].filter(tile => tile);
   }
 
-  function swapTiles (tile1, tile2) {
-    const {x, y} = tile1;
+  function findEmptyTile(tiletileCollection) {
+    return tiletileCollection.filter(tile => (tile && tile.isEmpty) === true)[0];
+  }
 
-    tile1.x = tile2.x;
-    tile1.y = tile2.y;
-    tile2.x = x;
-    tile2.y = y;
+  function swapTiles (tile, emptyTile) {
+    // visual swapping (This must be done before logical swapping.)
+    const tileTransform = `translate(${emptyTile.x * options.tileSize}px, ${emptyTile.y * options.tileSize}px)`;
+    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
+    tile.tileElement.style.transform = tileTransform;
+    emptyTile.tileElement.style.transform = emptyTileTransform;
+
+    // logical swapping
+    const {x, y} = tile;
+
+    tile.x = emptyTile.x;
+    tile.y = emptyTile.y;
+    emptyTile.x = x;
+    emptyTile.y = y;
   }
 
   function findTileInPosition(px, py) {
@@ -122,6 +128,43 @@
       return tile.x === px && tile.y === py;
     })
     return matches[0];
+  }
+
+  function shuffleTiles() {
+    return new Promise(resolve => {
+      let times = Math.floor(options.dificulty * 6) * options.columns * options.columns;
+      let excludedTile;
+
+      const intervalId = setInterval(function(){
+        if (times === 0) {
+          clearInterval(intervalId);
+          resolve();
+        }
+        excludedTile = moveRandomTile(excludedTile);
+        times--;
+      }, 5);
+    });
+
+  }
+
+  function moveRandomTile(excludedTile) {
+    const emptyTile = findEmptyTile(tiles);
+    let tileCollection = findNeighbouringTiles(emptyTile);
+
+    // remove excluded tile from collection
+    tileCollection = tileCollection.filter(tile => tile !== excludedTile);
+
+    const targetTile = getRandomTileFromCollection(tileCollection);
+    swapTiles(targetTile, emptyTile);
+    return targetTile;
+  }
+
+  function getRandomTileFromCollection(tileCollection) {
+    let randomIndex = Math.floor(Math.random() * tileCollection.length);
+    if (randomIndex === tileCollection.length) {
+      randomIndex -= 1;
+    }
+    return tileCollection[randomIndex];
   }
 
   function renderTiles() {
