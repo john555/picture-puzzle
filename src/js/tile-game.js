@@ -197,12 +197,14 @@
     emptyTile.tileElement.style.transform = emptyTileTransform;
 
     // logical swapping
-    const {x, y} = tile;
+    const { x, y, order } = tile;
 
     tile.x = emptyTile.x;
     tile.y = emptyTile.y;
+    tile.order = emptyTile.order;
     emptyTile.x = x;
     emptyTile.y = y;
+    emptyTile.order = order;
   }
 
   function findTileInPosition(gameInstance, px, py) {
@@ -255,6 +257,20 @@
     init(this, options);
   }
 
+  TileGame.prototype.isSolved = function() {
+    const { tiles } = this;
+
+    for (let i = 0; i < tiles.length; i++) {
+      const tile = tiles[i];
+
+      if (tile.order !== i) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
   TileGame.prototype.shuffle = function() {
     const { options } = this;
 
@@ -271,7 +287,7 @@
         times--;
       }, 5);
     });
-  } 
+  }
 
   // export game object
   global.TileGame = TileGame;
