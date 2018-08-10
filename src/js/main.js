@@ -1,6 +1,6 @@
 'use strict';
 
-const game = TileGame({
+const game = new TileGame({
   tileSize: 150,
   columns: 5,
   rows: 4,
@@ -8,4 +8,6 @@ const game = TileGame({
 });
 
 document.getElementById('game')
-  .appendChild(game);
+  .appendChild(game.stage);
+
+game.shuffle();

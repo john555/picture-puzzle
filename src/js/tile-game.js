@@ -1,40 +1,46 @@
 'use strict';
 
 (function(global){
-  const tiles = [];
+  
   const duration = 200;
 
-  let options = {
+  let defaultOptions = {
     tileSize: 120,
     rows: 4,
     columns: 4,
     dificulty: 1,
   };
 
-  let stage;
-
-  function init(userOptions) {
+  function init(gameInstance, userOptions) {
     if (!userOptions.imageUrl) {
       throw new Error('You MUST specify the image to use.');
     }
 
-    // Override default options with user options
-    Object.assign(options, userOptions);
-    stage = createStage();
+    gameInstance.tiles = [];
 
-    createTiles();
-    renderTiles();
-    shuffleTiles();
+    // Override default options with user options
+    gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
+    
+    gameInstance.stage = createStage(gameInstance);
+    
+    createTiles(gameInstance);
+    renderTiles(gameInstance);
+    // shuffleTiles(gameInstance);
+    return gameInstance.stage;
   };
 
-  function createStage() {
-    const tileWrapper = document.createElement('div');
-    tileWrapper.style.width = `${options.tileSize * options.columns}px`;
-    tileWrapper.style.height = `${options.tileSize * options.rows}px`;
-    return tileWrapper;
+  function createStage(gameInstance) {
+    const { options } = gameInstance;
+    const stageElem = document.createElement('div');
+    stageElem.style.position = 'relative';
+    stageElem.style.width = `${options.tileSize * options.columns}px`;
+    stageElem.style.height = `${options.tileSize * options.rows}px`;
+
+    return stageElem;
   }
 
-  function createTiles() {
+  function createTiles(gameInstance) {
+    const { options, tiles } = gameInstance;
     let order = 0;
 
     for (let y = 0; y < options.rows; y++) {
@@ -68,37 +74,38 @@
           tileElement,
         };
 
-        bindEvents(tile)
+        bindEvents(gameInstance, tile);
         tiles.push(tile);
         order++;
       }
     } 
   }
 
-  function bindEvents(tile) {
-    tile.tileElement.addEventListener('click', onTileClick.bind(tile));
+  function bindEvents(gameInstance, tile) {
+    tile.tileElement.addEventListener('click', onTileClick.bind({ gameInstance, tile }));
   }
 
   function onTileClick(event) {
-    moveTile(this);
+    const { gameInstance, tile } = this;
+    moveTile(gameInstance, tile);
   }
 
-  function moveTile(tile) {
-    const tileCollection = findNeighbouringTiles(tile);
+  function moveTile(gameInstance, tile) {
+    const tileCollection = findNeighbouringTiles(gameInstance, tile);
     const emptyTile = findEmptyTile(tileCollection);
 
     if (!emptyTile) {
       return;
     }
   
-    swapTiles(tile, emptyTile);
+    swapTiles(gameInstance, tile, emptyTile);
   }
 
-  function findNeighbouringTiles(tile) {
-    const topTile = findTileInPosition(tile.x, tile.y - 1);
-    const rightTile = findTileInPosition(tile.x + 1, tile.y);
-    const bottomTile = findTileInPosition(tile.x, tile.y + 1);
-    const leftTile = findTileInPosition(tile.x - 1, tile.y);
+  function findNeighbouringTiles(gameInstance, tile) {
+    const topTile = findTileInPosition(gameInstance, tile.x, tile.y - 1);
+    const rightTile = findTileInPosition(gameInstance, tile.x + 1, tile.y);
+    const bottomTile = findTileInPosition(gameInstance, tile.x, tile.y + 1);
+    const leftTile = findTileInPosition(gameInstance, tile.x - 1, tile.y);
 
     return [topTile, rightTile, bottomTile, leftTile].filter(tile => tile);
   }
@@ -107,7 +114,8 @@
     return tiletileCollection.filter(tile => (tile && tile.isEmpty) === true)[0];
   }
 
-  function swapTiles (tile, emptyTile) {
+  function swapTiles(gameInstance, tile, emptyTile) {
+    const { options } = gameInstance;
     // visual swapping (This must be done before logical swapping.)
     const tileTransform = `translate(${emptyTile.x * options.tileSize}px, ${emptyTile.y * options.tileSize}px)`;
     const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
@@ -123,39 +131,24 @@
     emptyTile.y = y;
   }
 
-  function findTileInPosition(px, py) {
+  function findTileInPosition(gameInstance, px, py) {
+    const { tiles } = gameInstance;
     const matches = tiles.filter(tile => {
       return tile.x === px && tile.y === py;
     })
     return matches[0];
   }
 
-  function shuffleTiles() {
-    return new Promise(resolve => {
-      let times = Math.floor(options.dificulty * 6) * options.columns * options.columns;
-      let excludedTile;
-
-      const intervalId = setInterval(function(){
-        if (times === 0) {
-          clearInterval(intervalId);
-          resolve();
-        }
-        excludedTile = moveRandomTile(excludedTile);
-        times--;
-      }, 5);
-    });
-
-  }
-
-  function moveRandomTile(excludedTile) {
+  function moveRandomTile(gameInstance, excludedTile) {
+    const { tiles } = gameInstance;
     const emptyTile = findEmptyTile(tiles);
-    let tileCollection = findNeighbouringTiles(emptyTile);
+    let tileCollection = findNeighbouringTiles(gameInstance, emptyTile);
 
     // remove excluded tile from collection
     tileCollection = tileCollection.filter(tile => tile !== excludedTile);
 
     const targetTile = getRandomTileFromCollection(tileCollection);
-    swapTiles(targetTile, emptyTile);
+    swapTiles(gameInstance, targetTile, emptyTile);
     return targetTile;
   }
 
@@ -167,7 +160,8 @@
     return tileCollection[randomIndex];
   }
 
-  function renderTiles() {
+  function renderTiles(gameInstance) {
+    const { tiles, stage } = gameInstance;
     // TODO: Do validation on stage
 
     if (tiles.length < 0) {
@@ -180,15 +174,32 @@
   }
 
   function TileGame(options) {
-    if (this === global) {
-      return new TileGame();
+    if (!this || this === global) {
+      return new TileGame(options);
     }
-
-    init(options);
-
-    return stage;
+    
+    init(this, options);
   }
 
+  TileGame.prototype.shuffle = function() {
+    const { options } = this;
+
+    return new Promise(resolve => {
+      let times = Math.floor(options.dificulty * 6) * options.columns * options.columns;
+      let excludedTile;
+
+      const intervalId = setInterval(() => {
+        if (times === 0) {
+          clearInterval(intervalId);
+          resolve();
+        }
+        excludedTile = moveRandomTile(this, excludedTile);
+        times--;
+      }, 5);
+    });
+  } 
+
+  // export game object
   global.TileGame = TileGame;
 
 })(window);
