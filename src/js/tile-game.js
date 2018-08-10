@@ -22,6 +22,7 @@
     }
 
     gameInstance.tiles = [];
+    gameInstance.isPlaying = false;
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
@@ -88,9 +89,21 @@
 
   function bindEvents(gameInstance, tile) {
     tile.tileElement.addEventListener('click', onTileClick.bind({ gameInstance, tile }));
+    tile.tileElement.addEventListener('transitionend', onTransitionEnd.bind(gameInstance));
   }
 
-  function onTileClick(event) {
+  function onTransitionEnd() {
+    if (this.isPlaying && this.isSolved()) {
+      this.stage.dispatchEvent(new Event('solve'));
+      this.isPlaying = false;
+    }
+  }
+
+  function onTileClick() {
+    if (!this.gameInstance.isPlaying) {
+      return;
+    }
+
     const { gameInstance, tile } = this;
     handleMoveManyTiles(gameInstance, tile);
   }
@@ -257,6 +270,17 @@
     init(this, options);
   }
 
+  TileGame.prototype.start = function() {
+    if (this.isPlaying) {
+      return new Promise(resolve => {
+        resolve();
+      });
+    }
+    return this.shuffle().then(() => {
+      this.isPlaying = true
+    });
+  }
+
   TileGame.prototype.isSolved = function() {
     const { tiles } = this;
 
@@ -269,7 +293,7 @@
     }
 
     return true;
-  }
+  };
 
   TileGame.prototype.shuffle = function() {
     const { options } = this;
@@ -287,7 +311,11 @@
         times--;
       }, 5);
     });
-  }
+  };
+
+  TileGame.prototype.onSolve = function(callback) {
+    this.stage.addEventListener('solve', callback);
+  };
 
   // export game object
   global.TileGame = TileGame;
