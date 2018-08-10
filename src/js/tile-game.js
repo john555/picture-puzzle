@@ -11,6 +11,11 @@
     dificulty: 1,
   };
 
+  const inverseAxes = {
+    x: 'y',
+    y: 'x',
+  };
+
   function init(gameInstance, userOptions) {
     if (!userOptions.imageUrl) {
       throw new Error('You MUST specify the image to use.');
@@ -87,10 +92,10 @@
 
   function onTileClick(event) {
     const { gameInstance, tile } = this;
-    moveTile(gameInstance, tile);
+    handleMoveManyTiles(gameInstance, tile);
   }
 
-  function moveTile(gameInstance, tile) {
+  function moveOneTile(gameInstance, tile) {
     const tileCollection = findNeighbouringTiles(gameInstance, tile);
     const emptyTile = findEmptyTile(tileCollection);
 
@@ -99,6 +104,75 @@
     }
   
     swapTiles(gameInstance, tile, emptyTile);
+  }
+
+  function handleMoveManyTiles(gameInstance, lastTile) {
+    const { tiles } = gameInstance;
+    const emptyTile = findEmptyTile(tiles);
+    const axis = getMatchingAxis(emptyTile, lastTile);
+
+    if (!axis) {
+      return;
+    }
+
+    const iAxis = inverseAxes[axis];
+    const startTile = (lastTile[iAxis] < emptyTile[iAxis]) ? lastTile : emptyTile;
+    const endTile = (lastTile[iAxis] < emptyTile[iAxis]) ? emptyTile : lastTile;
+
+    const movingTiles = getTilesInRange(gameInstance, emptyTile, startTile, endTile, axis);
+
+    moveManyTiles(gameInstance, movingTiles, iAxis);
+  }
+
+  function moveManyTiles(gameInstance, tiles, varyingAxis) {
+    // When first tile is empty
+    const firstTile = tiles[0];
+
+    if (!firstTile) {
+      return;
+    }
+
+    if (firstTile.isEmpty) {
+      // move first tile to the end
+      for (let i = 1; i < tiles.length; i++) {
+        swapTiles(gameInstance, firstTile, tiles[i])
+      }
+      return;
+    }
+
+    const lastTile = tiles[tiles.length - 1];
+
+    if (!lastTile) {
+      return;
+    }
+
+    for (let i = tiles.length - 1; i >= 0; i--) {
+      swapTiles(gameInstance, lastTile, tiles[i]);
+    }
+  }
+
+  function getTilesInRange(gameInstance, emptyTile, startTile, endTile, axis) {
+    const { tiles } = gameInstance;
+
+    const iAxis = inverseAxes[axis];
+    
+    const range = tiles.filter(tile => {
+      
+      const isInRange = (tile[iAxis] >= startTile[iAxis]) && (tile[iAxis] <= endTile[iAxis]);
+      return isInRange && (tile[axis] === emptyTile[axis]);
+    });
+
+    return range.sort((a, b) => a[iAxis] > b[iAxis]);
+  }
+
+  function getMatchingAxis(tile1, tile2) {
+    if (tile1.x === tile2.x) {
+      return 'x';
+    }
+    
+    if (tile1.y === tile2.y) {
+      return 'y';
+    }
   }
 
   function findNeighbouringTiles(gameInstance, tile) {
