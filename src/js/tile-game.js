@@ -62,13 +62,13 @@
         tileElement.style.top = '0';
         tileElement.style.transform = `translate(${left}px, ${top}px)`;
         tileElement.style.transition = `transform ${duration}ms linear`;
+        tileElement.style.backgroundImage = `url(${options.imageUrl})`;
+        tileElement.style.backgroundRepeat = 'no-repeat';
+        tileElement.style.backgroundPosition = `-${left}px -${top}px`;
+        tileElement.style.backgroundSize = `auto ${options.columns * options.tileSize}px`;
 
-        
-        if (!isEmpty) {
-          tileElement.style.backgroundImage = `url(${options.imageUrl})`;
-          tileElement.style.backgroundRepeat = 'no-repeat';
-          tileElement.style.backgroundPosition = `-${left}px -${top}px`;
-          tileElement.style.backgroundSize = `auto ${options.columns * options.tileSize}px`;
+        if (isEmpty) {
+          tileElement.style.opacity = '0';
         }
 
         const tile = {
@@ -267,7 +267,7 @@
         return false;
       }
     }
-    
+
     return true;
   }
 
