@@ -16,6 +16,17 @@
     y: 'x',
   };
 
+  const keyDirections = {
+    37: 'right',
+    38: 'bottom',
+    39: 'left',
+    40: 'top',
+    83: 'top',
+    87: 'bottom',
+    65: 'right',
+    68: 'left',
+  };
+
   function init(gameInstance, userOptions) {
     if (!userOptions.imageUrl) {
       throw new Error('You MUST specify the image to use.');
@@ -31,6 +42,7 @@
     
     createTiles(gameInstance);
     renderTiles(gameInstance);
+    bindEvents(gameInstance);
     // shuffleTiles(gameInstance);
     return gameInstance.stage;
   };
@@ -98,16 +110,69 @@
           tileElement,
         };
 
-        bindEvents(gameInstance, tile);
+        bindTileEvents(gameInstance, tile);
         tiles.push(tile);
         order++;
       }
     } 
   }
 
-  function bindEvents(gameInstance, tile) {
+  function bindTileEvents(gameInstance, tile) {
     tile.tileElement.addEventListener('click', onTileClick.bind({ gameInstance, tile }));
     tile.tileElement.addEventListener('transitionend', onTransitionEnd.bind(gameInstance));
+  }
+
+  function bindEvents(gameInstance) {
+    if (global.addEventListener && typeof global.addEventListener === 'function') {
+      global.addEventListener('keydown', onKeyDown.bind(null, gameInstance));
+    }
+  }
+
+  function onKeyDown(gameInstance, event) {
+    if (!gameInstance.isPlaying) {
+      return;
+    }
+    
+    const emptyTile = findEmptyTile(gameInstance.tiles);
+
+    switch(keyDirections[event.keyCode]) {
+      case 'top':
+        const topTile = findTileInPosition(gameInstance, emptyTile.x, emptyTile.y - 1);
+
+        if (!topTile) {
+          return;
+        }
+
+        swapTiles(gameInstance, topTile, emptyTile);
+      break;
+      case 'right':
+        const rightTile = findTileInPosition(gameInstance, emptyTile.x + 1, emptyTile.y);
+
+        if (!rightTile) {
+          return;
+        }
+
+        swapTiles(gameInstance, rightTile, emptyTile);
+      break;
+      case 'bottom':
+        const bottomTile = findTileInPosition(gameInstance, emptyTile.x, emptyTile.y + 1);
+        
+        if (!bottomTile) {
+          return;
+        }
+
+        swapTiles(gameInstance, bottomTile, emptyTile);
+      break;
+      case 'left':
+        const leftTile = findTileInPosition(gameInstance, emptyTile.x - 1, emptyTile.y);
+        
+        if (!leftTile) {
+          return;
+        }
+
+        swapTiles(gameInstance, leftTile, emptyTile);
+      break;
+    }
   }
 
   function onTransitionEnd() {
@@ -124,17 +189,6 @@
 
     const { gameInstance, tile } = this;
     handleMoveManyTiles(gameInstance, tile);
-  }
-
-  function moveOneTile(gameInstance, tile) {
-    const tileCollection = findNeighbouringTiles(gameInstance, tile);
-    const emptyTile = findEmptyTile(tileCollection);
-
-    if (!emptyTile) {
-      return;
-    }
-  
-    swapTiles(gameInstance, tile, emptyTile);
   }
 
   function handleMoveManyTiles(gameInstance, lastTile) {
@@ -219,29 +273,29 @@
     return tiletileCollection.filter(tile => (tile && tile.isEmpty) === true)[0];
   }
 
-  function swapTiles(gameInstance, tile, emptyTile) {
+  function swapTiles(gameInstance, tile, tile2) {
     const { options } = gameInstance;
     // visual swapping (This must be done before logical swapping.)
-    const tileTransform = `translate(${emptyTile.x * options.tileSize}px, ${emptyTile.y * options.tileSize}px)`;
+    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px)`;
     const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
     
     addStyle(tile.tileElement, {
       transform: tileTransform,
     });
 
-    addStyle(emptyTile.tileElement, {
+    addStyle(tile2.tileElement, {
       transform: emptyTileTransform,
     });
 
     // logical swapping
     const { x, y, order } = tile;
 
-    tile.x = emptyTile.x;
-    tile.y = emptyTile.y;
-    tile.order = emptyTile.order;
-    emptyTile.x = x;
-    emptyTile.y = y;
-    emptyTile.order = order;
+    tile.x = tile2.x;
+    tile.y = tile2.y;
+    tile.order = tile2.order;
+    tile2.x = x;
+    tile2.y = y;
+    tile2.order = order;
   }
 
   function findTileInPosition(gameInstance, px, py) {
