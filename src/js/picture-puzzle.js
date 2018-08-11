@@ -183,6 +183,7 @@
         solveEvent.time = gameInstance.time;
         gameInstance.stage.dispatchEvent(solveEvent);
         gameInstance.isPlaying = false;
+        clearInterval(gameInstance.timer);
       }
     }
   }
