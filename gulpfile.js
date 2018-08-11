@@ -3,8 +3,8 @@ const browserSync = require('browser-sync').create();
 const plumber = require('gulp-plumber');
 const sass = require('gulp-sass');
 const uglifyCss = require('gulp-uglifycss');
-const browserify = require('browserify');
-const source = require('vinyl-source-stream');
+
+const env = process.env.NODE_ENV || 'production';
 
 const destDir = 'build';
 const stylesDir = 'src/scss';
@@ -53,4 +53,10 @@ gulp.task('watch', () => {
   gulp.watch(`${scriptsDir}/**/*.js`, ['js']);
 });
 
-gulp.task('default', ['html', 'images', 'scss', 'js', 'serve', 'watch']);
+let taskList = ['html', 'images', 'scss', 'js'];
+
+if (env === 'development') {
+  taskList = taskList.concat(['serve', 'watch']);
+}
+
+gulp.task('default', taskList);
