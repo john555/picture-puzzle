@@ -300,8 +300,17 @@
         resolve();
       });
     }
+
     return this.shuffle().then(() => {
-      this.isPlaying = true
+      this.isPlaying = true;
+      let time = 0;
+
+      this.timer = setInterval(() => {
+        const timeUpdateEvent = new Event('timeupdate');
+        timeUpdateEvent.time = time++;
+
+        this.stage.dispatchEvent(timeUpdateEvent);
+      }, 1000);
     });
   }
 
@@ -338,7 +347,14 @@
   };
 
   PicturePuzzle.prototype.onSolve = function(callback) {
-    this.stage.addEventListener('solve', callback);
+    this.stage.addEventListener('solve', event => {
+      clearInterval(this.timer);
+      callback.call(this, event);
+    });
+  };
+
+  PicturePuzzle.prototype.onTimeUpdate = function(callback) {
+    this.stage.addEventListener('timeupdate', callback);
   };
 
   // export game object
