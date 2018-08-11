@@ -262,15 +262,15 @@
     }
   }
 
-  function TileGame(options) {
+  function PicturePuzzle(options) {
     if (!this || this === global) {
-      return new TileGame(options);
+      return new PicturePuzzle(options);
     }
     
     init(this, options);
   }
 
-  TileGame.prototype.start = function() {
+  PicturePuzzle.prototype.start = function() {
     if (this.isPlaying) {
       return new Promise(resolve => {
         resolve();
@@ -281,7 +281,7 @@
     });
   }
 
-  TileGame.prototype.isSolved = function() {
+  PicturePuzzle.prototype.isSolved = function() {
     const { tiles } = this;
 
     for (let i = 0; i < tiles.length; i++) {
@@ -295,7 +295,7 @@
     return true;
   };
 
-  TileGame.prototype.shuffle = function() {
+  PicturePuzzle.prototype.shuffle = function() {
     const { options } = this;
 
     return new Promise(resolve => {
@@ -313,11 +313,11 @@
     });
   };
 
-  TileGame.prototype.onSolve = function(callback) {
+  PicturePuzzle.prototype.onSolve = function(callback) {
     this.stage.addEventListener('solve', callback);
   };
 
   // export game object
-  global.TileGame = TileGame;
+  global.PicturePuzzle = PicturePuzzle;
 
 })(window);
