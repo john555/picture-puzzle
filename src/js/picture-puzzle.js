@@ -34,7 +34,7 @@
 
     gameInstance.tiles = [];
     gameInstance.isPlaying = false;
-    gameInstance.time = 0;
+    gameInstance.time = 1;
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
@@ -179,11 +179,14 @@
   function onTransitionEnd(gameInstance) {
     return function() {
       if (gameInstance.isPlaying && gameInstance.isSolved()) {
+        clearInterval(gameInstance.timer);
         const solveEvent = new Event('solve');
-        solveEvent.time = gameInstance.time;
+
+        // Subtract 1 in order to match this time 
+        // with the value sent via the timeupdate event
+        solveEvent.time = gameInstance.time - 1;
         gameInstance.stage.dispatchEvent(solveEvent);
         gameInstance.isPlaying = false;
-        clearInterval(gameInstance.timer);
       }
     }
   }
@@ -369,7 +372,7 @@
 
     return this.shuffle().then(() => {
       this.isPlaying = true;
-      
+      updateTime(this);
       this.timer = setInterval(() => {
         updateTime(this);
       }, 1000);
