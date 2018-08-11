@@ -346,6 +346,12 @@
     }
   }
 
+  function updateTime(gameInstance) {
+    const timeUpdateEvent = new Event('timeupdate');
+    timeUpdateEvent.time = gameInstance.time++;
+    gameInstance.stage.dispatchEvent(timeUpdateEvent);
+  }
+
   function PicturePuzzle(options) {
     if (!this || this === global) {
       return new PicturePuzzle(options);
@@ -363,12 +369,9 @@
 
     return this.shuffle().then(() => {
       this.isPlaying = true;
-
+      
       this.timer = setInterval(() => {
-        const timeUpdateEvent = new Event('timeupdate');
-        timeUpdateEvent.time = this.time++;
-
-        this.stage.dispatchEvent(timeUpdateEvent);
+        updateTime(this);
       }, 1000);
 
       this.stage.dispatchEvent(new Event('start'));
