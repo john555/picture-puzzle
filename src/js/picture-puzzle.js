@@ -34,7 +34,7 @@
 
     gameInstance.tiles = [];
     gameInstance.isPlaying = false;
-    gameInstance.time = 1;
+    gameInstance.time = 0;
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
