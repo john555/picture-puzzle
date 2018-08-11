@@ -34,6 +34,7 @@
 
     gameInstance.tiles = [];
     gameInstance.isPlaying = false;
+    gameInstance.time = 0;
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
@@ -119,7 +120,7 @@
 
   function bindTileEvents(gameInstance, tile) {
     tile.tileElement.addEventListener('click', onTileClick.bind({ gameInstance, tile }));
-    tile.tileElement.addEventListener('transitionend', onTransitionEnd.bind(gameInstance));
+    tile.tileElement.addEventListener('transitionend', onTransitionEnd(gameInstance));
   }
 
   function bindEvents(gameInstance) {
@@ -132,7 +133,7 @@
     if (!gameInstance.isPlaying) {
       return;
     }
-    
+
     const emptyTile = findEmptyTile(gameInstance.tiles);
 
     switch(keyDirections[event.keyCode]) {
@@ -175,10 +176,14 @@
     }
   }
 
-  function onTransitionEnd() {
-    if (this.isPlaying && this.isSolved()) {
-      this.stage.dispatchEvent(new Event('solve'));
-      this.isPlaying = false;
+  function onTransitionEnd(gameInstance) {
+    return function() {
+      if (gameInstance.isPlaying && gameInstance.isSolved()) {
+        const solveEvent = new Event('solve');
+        solveEvent.time = gameInstance.time;
+        gameInstance.stage.dispatchEvent(solveEvent);
+        gameInstance.isPlaying = false;
+      }
     }
   }
 
@@ -357,14 +362,15 @@
 
     return this.shuffle().then(() => {
       this.isPlaying = true;
-      let time = 0;
 
       this.timer = setInterval(() => {
         const timeUpdateEvent = new Event('timeupdate');
-        timeUpdateEvent.time = time++;
+        timeUpdateEvent.time = this.time++;
 
         this.stage.dispatchEvent(timeUpdateEvent);
       }, 1000);
+
+      this.stage.dispatchEvent(new Event('start'));
     });
   }
 
@@ -400,10 +406,15 @@
     });
   };
 
+  PicturePuzzle.prototype.onStart = function(callback) {
+    this.stage.addEventListener('start', callback);
+  };
+
   PicturePuzzle.prototype.onSolve = function(callback) {
     this.stage.addEventListener('solve', event => {
       clearInterval(this.timer);
       callback.call(this, event);
+      this.time = 0;
     });
   };
 
