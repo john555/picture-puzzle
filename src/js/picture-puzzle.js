@@ -8,7 +8,7 @@
     tileSize: 120,
     rows: 4,
     columns: 4,
-    dificulty: 1,
+    difficulty: 4,
   };
 
   const inverseAxes = {
@@ -323,7 +323,7 @@
     const { options } = this;
 
     return new Promise(resolve => {
-      let times = Math.floor(options.dificulty * 6) * options.columns * options.columns;
+      let times = Math.floor(Math.abs(options.difficulty * options.columns * options.columns));
       let excludedTile;
 
       const intervalId = setInterval(() => {
