@@ -38,11 +38,26 @@
   function createStage(gameInstance) {
     const { options } = gameInstance;
     const stageElem = document.createElement('div');
-    stageElem.style.position = 'relative';
-    stageElem.style.width = `${options.tileSize * options.columns}px`;
-    stageElem.style.height = `${options.tileSize * options.rows}px`;
+  
+    addStyle(stageElem, {
+      position: 'relative',
+      width: `${options.tileSize * options.columns}px`,
+      height: `${options.tileSize * options.rows}px`,
+    });
 
     return stageElem;
+  }
+
+  function addStyle(element, styleObject) {
+    if (!element || element.nodeType !== 1) {
+      throw new Error(`addSstyle(${element}, ${styleObject}) failed.`);
+    }
+
+    for (let property in styleObject) {
+      if (styleObject.hasOwnProperty(property)) {
+        element.style[property] = styleObject[property]
+      }
+    }
   }
 
   function createTiles(gameInstance) {
@@ -55,21 +70,24 @@
         const left = x * options.tileSize;
         const top = y * options.tileSize;
         const isEmpty = order === (options.rows * options.columns - 1);
-        
-        tileElement.style.width = `${options.tileSize}px`;
-        tileElement.style.height = `${options.tileSize}px`;
-        tileElement.style.position = `absolute`;
-        tileElement.style.left = '0';
-        tileElement.style.top = '0';
-        tileElement.style.transform = `translate(${left}px, ${top}px)`;
-        tileElement.style.transition = `transform ${duration}ms linear`;
-        tileElement.style.backgroundImage = `url(${options.imageUrl})`;
-        tileElement.style.backgroundRepeat = 'no-repeat';
-        tileElement.style.backgroundPosition = `-${left}px -${top}px`;
-        tileElement.style.backgroundSize = `auto ${options.columns * options.tileSize}px`;
 
-        if (isEmpty) {
-          tileElement.style.opacity = '0';
+        addStyle(tileElement, {
+          width: `${options.tileSize}px`,
+          height:`${options.tileSize}px`,
+          position:`absolute`,
+          left: '0',
+          top:'0',
+          transform: `translate(${left}px, ${top}px)`,
+          transition: `transform ${duration}ms linear`,
+        });
+        
+        if (!isEmpty) {
+          addStyle(tileElement, {
+            backgroundImage: `url(${options.imageUrl})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: `-${left}px -${top}px`,
+            backgroundSize: `auto ${options.columns * options.tileSize}px`,
+          });
         }
 
         const tile = {
@@ -206,8 +224,14 @@
     // visual swapping (This must be done before logical swapping.)
     const tileTransform = `translate(${emptyTile.x * options.tileSize}px, ${emptyTile.y * options.tileSize}px)`;
     const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
-    tile.tileElement.style.transform = tileTransform;
-    emptyTile.tileElement.style.transform = emptyTileTransform;
+    
+    addStyle(tile.tileElement, {
+      transform: tileTransform,
+    });
+
+    addStyle(emptyTile.tileElement, {
+      transform: emptyTileTransform,
+    });
 
     // logical swapping
     const { x, y, order } = tile;
