@@ -9,6 +9,7 @@
     rows: 4,
     columns: 4,
     difficulty: 4,
+    scale: 1,
   };
 
   const inverseAxes = {
@@ -90,8 +91,9 @@
           position:`absolute`,
           left: '0',
           top:'0',
-          transform: `translate(${left}px, ${top}px)`,
+          transform: `translate(${left}px, ${top}px) scale(${options.scale})`,
           transition: `transform ${duration}ms linear`,
+          zIndex: 1,
         });
         
         if (!isEmpty) {
@@ -100,6 +102,7 @@
             backgroundRepeat: 'no-repeat',
             backgroundPosition: `-${left}px -${top}px`,
             backgroundSize: `auto ${options.columns * options.tileSize}px`,
+            zIndex: 2,
           });
         }
 
@@ -285,8 +288,8 @@
   function swapTiles(gameInstance, tile, tile2) {
     const { options } = gameInstance;
     // visual swapping (This must be done before logical swapping.)
-    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px)`;
-    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
+    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px) scale(${options.scale})`;
+    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px) scale(${options.scale})`;
     
     addStyle(tile.tileElement, {
       transform: tileTransform,
@@ -316,8 +319,7 @@
   }
 
   function moveRandomTile(gameInstance, excludedTile) {
-    const { tiles } = gameInstance;
-    const emptyTile = findEmptyTile(tiles);
+    const emptyTile = findEmptyTile(gameInstance.tiles);
     let tileCollection = findNeighbouringTiles(gameInstance, emptyTile);
 
     // remove excluded tile from collection
