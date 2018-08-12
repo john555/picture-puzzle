@@ -2,7 +2,7 @@
 
 (function(global){
   
-  const duration = 200;
+  const duration = 150;
 
   let defaultOptions = {
     tileSize: 120,
