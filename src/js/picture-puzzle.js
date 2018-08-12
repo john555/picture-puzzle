@@ -64,7 +64,7 @@
 
   function addStyle(element, styleObject) {
     if (!element || element.nodeType !== 1) {
-      throw new Error(`addSstyle(${element}, ${styleObject}) failed.`);
+      throw new Error(`addStyle(${element}, ${styleObject}) failed.`);
     }
 
     for (let property in styleObject) {
@@ -72,6 +72,30 @@
         element.style[property] = styleObject[property]
       }
     }
+  }
+
+  function animateTiles(gameInstance) {
+    const { tiles, options } = gameInstance;
+    let times = 5;
+    const scaleValues = [options.scale, 0.8];
+    const rotatationValues = [0, -30];
+
+    const id = setInterval(() => {
+      if (times === 0) {
+        clearInterval(id);
+      }
+
+      for (let i = 0; i < tiles.length; i++) {
+        const tile = tiles[i];
+        const x = tile.x * options.tileSize;
+        const y = tile.y * options.tileSize;
+        addStyle(tile.tileElement, {
+          transform: `translate(${x}px, ${y}px) scale(${scaleValues[times % scaleValues.length]}) rotate(${rotatationValues[(times * tile.y) % rotatationValues.length]}deg)`,
+        });
+      }
+
+      times--;
+    }, duration);
   }
 
   function createTiles(gameInstance) {
@@ -190,6 +214,7 @@
         solveEvent.time = gameInstance.time - 1;
         gameInstance.stage.dispatchEvent(solveEvent);
         gameInstance.isPlaying = false;
+        animateTiles(gameInstance);
       }
     }
   }
