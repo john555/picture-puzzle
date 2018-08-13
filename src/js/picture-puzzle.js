@@ -10,6 +10,10 @@
     columns: 4,
     difficulty: 4,
     scale: 0.996,
+    image: {
+      preserve: 'width',
+      offset: 0,
+    }
   };
 
   const inverseAxes = {
@@ -28,8 +32,10 @@
     68: 'left',
   };
 
+  const preserveWhiteList = ['width', 'height'];
+
   function init(gameInstance, userOptions) {
-    if (!userOptions.imageUrl) {
+    if (!userOptions.image.url) {
       throw new Error('You MUST specify the image to use.');
     }
 
@@ -37,8 +43,15 @@
     gameInstance.isPlaying = false;
     gameInstance.time = 0;
 
+    if (userOptions.image.preserve && preserveWhiteList.indexOf(userOptions.image.preserve) < 0) {
+      throw new Error(`Invalid value '${userOptions.image.preserve}' for the option image.preserve`)
+    }
+
+    const imageOptions =  Object.assign({}, defaultOptions.image, userOptions.image)
+
     // Override default options with user options
-    gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
+    gameInstance.options = Object.assign({}, defaultOptions, userOptions);
+    gameInstance.options.image = imageOptions;
     
     gameInstance.stage = createStage(gameInstance);
     
@@ -77,7 +90,7 @@
   function animateTiles(gameInstance) {
     const { tiles, options } = gameInstance;
     let times = 5;
-    const scaleValues = [options.scale, 0.5];
+    const scaleValues = [options.scale, 0.85];
     const rotatationValues = [0, -30];
     const axes = ['y', 'x'];
     const randomAxis = axes[Math.floor(Math.random() * 2)];
@@ -114,6 +127,19 @@
         const left = x * options.tileSize;
         const top = y * options.tileSize;
         const isEmpty = order === (options.rows * options.columns - 1);
+        
+        let backgroundSize = '';
+        let backgroundPosition = '';
+
+        if(options.image.preserve === 'width') {
+          backgroundSize = `${options.columns * options.tileSize}px auto`;
+          backgroundPosition = `-${left}px -${top - options.image.offset}px`;
+        }
+
+        if (options.image.preserve === 'height') {
+          backgroundSize = `auto ${options.columns * options.tileSize}px`;
+          backgroundPosition = `-${left - options.image.offset}px -${top}px`;
+        }
 
         addStyle(tileElement, {
           width: `${options.tileSize}px`,
@@ -128,10 +154,10 @@
         
         if (!isEmpty) {
           addStyle(tileElement, {
-            backgroundImage: `url(${options.imageUrl})`,
+            backgroundImage: `url(${options.image.url})`,
             backgroundRepeat: 'no-repeat',
-            backgroundPosition: `-${left}px -${top}px`,
-            backgroundSize: `auto ${options.columns * options.tileSize}px`,
+            backgroundPosition,
+            backgroundSize,
             zIndex: 2,
           });
         }
