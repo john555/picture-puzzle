@@ -9,7 +9,7 @@
     rows: 4,
     columns: 4,
     difficulty: 4,
-    scale: 1,
+    scale: 0.996,
   };
 
   const inverseAxes = {
@@ -77,8 +77,10 @@
   function animateTiles(gameInstance) {
     const { tiles, options } = gameInstance;
     let times = 5;
-    const scaleValues = [options.scale, 0.8];
+    const scaleValues = [options.scale, 0.5];
     const rotatationValues = [0, -30];
+    const axes = ['y', 'x'];
+    const randomAxis = axes[Math.floor(Math.random() * 2)];
 
     const id = setInterval(() => {
       if (times === 0) {
@@ -89,8 +91,12 @@
         const tile = tiles[i];
         const x = tile.x * options.tileSize;
         const y = tile.y * options.tileSize;
+        const translate = `translate(${x}px, ${y}px) scale(${scaleValues[times % scaleValues.length]})`;
+        const rotation = `rotate(${rotatationValues[(times * tile[randomAxis]) % rotatationValues.length]}deg)`;
+        const transform = `${translate} ${rotation}`;
+
         addStyle(tile.tileElement, {
-          transform: `translate(${x}px, ${y}px) scale(${scaleValues[times % scaleValues.length]}) rotate(${rotatationValues[(times * tile.y) % rotatationValues.length]}deg)`,
+          transform,
         });
       }
 
