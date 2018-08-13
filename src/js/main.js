@@ -20,7 +20,7 @@ const gameOptions = {
   tileSize,
   columns,
   rows,
-  difficulty: 0.08,
+  // difficulty: 0.08,
   image: {
     url: 'https://images.pexels.com/photos/1307662/pexels-photo-1307662.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
     preserve: 'height',
@@ -51,16 +51,13 @@ puzzle.onTimeUpdate(function(event) {
   const time = formatTime(event.time);
   minute.innerText = time.minutes;
   seconds.innerText = time.seconds;
-  console.log('-->', event.time);
 });
 
 puzzle.onSolve(function(event) {
-  console.log(event.time);
   startButton.style.visibility = 'visible';
   if (event.time < bestTime) {
     bestTime = event.time;
-  } 
-  
+  }
 });
 
 gameContainer.appendChild(puzzle.stage);

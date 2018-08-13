@@ -26,7 +26,7 @@ $ npm run dev
 
 ## Documentation.
 
-In order to integrate the game to your website or web app, include the js file in your HTML document.
+In order to integrate the game to your website or web app, include the `picture-puzzle.js` file in your HTML document.
 
 ```html
 <div id="game"></div>
@@ -40,7 +40,13 @@ const game = new PicturePuzzle({
   tileSize: 100, // width and height of the tile
   columns: 4,
   rows: 4,
-  imageUrl: '', // url or path to image
+  difficulty: 4,
+  scale: 0.996, // Determines the scale of the tiles. As scale value less than 1 reveals gridlines
+  image: { 
+    url: '/url/or/path/to/image', 
+    preserve: 'width', //['width', 'height'] the width or height will be preserved
+    offset: 0,
+  } 
 });
 
 document.getElementById('game')
@@ -54,10 +60,19 @@ Start the game.
 game.start();
 ```
 
-Do something when the puzzle is solved.
+### Events
+`onSolve()` - Do something when the puzzle is solved.
 
 ```js
-game.onSolve(function(){
-  alert('You win!');
+game.onSolve(function(event){
+  alert(`You solved the puzzle in ${event.time}s`);
 });
+```
+
+`onTimeUpdate()` - You can get update the timer during the course of the game.
+```js
+game.onTimeUpdate(function(event){
+  const time = event.time;
+});
+
 ```
