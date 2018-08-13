@@ -1,45 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Picture puzzle by John O. Paul</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Picture Puzzle by John O. Paul</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 <body>
-    <main class="app">
-        <div class="container">
-            <header class="mainHeader">
-                <h1 class="mainHeader__appName">Picture Puzzle</h1>
-                <a href="https://twitter.com/oyomtho" target="_blank" class="twitterLink">
-                    <svg data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>
-                </a>
-            </header>
-            <section class="gameArea">
-                <h1 class="sr-only">Puzzle</h1>
-                <div class="gameArea__gameWrapper">
-                    <div id="gameContainer" class="gameArea__game"></div>
-                    <div class="gameArea__dashboard">
-                        <div class="timer">
-                            <span class="timer__label">Time spent</span>
-                            <div class="timer__time">
-                                <span id="minute" class="timer__value timer__value--minutes">00</span>
-                                <span class="unit">min</span>  
-                            </div>
-                            <div class="timer__time">
-                                    <span id="seconds" class="timer__value timer__value--seconds">00</span>
-                                    <span class="unit">s</span>  
-                                </div>
-                        </div>
-                        <button id="startButton" class="gameArea__button">Start</button>
-                    </div>
-                </div>
-            </section>
+  <main class="app">
+    <div class="container">
+      <header class="mainHeader">
+        <h1 class="mainHeader__appName">Picture Puzzle</h1>
+        <a href="https://twitter.com/oyomtho" target="_blank" class="twitterLink">
+          <svg data-name="Logo — FIXED" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><style>.cls-1{fill:none;}.cls-2{fill:#1da1f2;}</style></defs><title>Twitter_Logo_Blue</title><rect class="cls-1" width="400" height="400"/><path class="cls-2" d="M153.62,301.59c94.34,0,145.94-78.16,145.94-145.94,0-2.22,0-4.43-.15-6.63A104.36,104.36,0,0,0,325,122.47a102.38,102.38,0,0,1-29.46,8.07,51.47,51.47,0,0,0,22.55-28.37,102.79,102.79,0,0,1-32.57,12.45,51.34,51.34,0,0,0-87.41,46.78A145.62,145.62,0,0,1,92.4,107.81a51.33,51.33,0,0,0,15.88,68.47A50.91,50.91,0,0,1,85,169.86c0,.21,0,.43,0,.65a51.31,51.31,0,0,0,41.15,50.28,51.21,51.21,0,0,1-23.16.88,51.35,51.35,0,0,0,47.92,35.62,102.92,102.92,0,0,1-63.7,22A104.41,104.41,0,0,1,75,278.55a145.21,145.21,0,0,0,78.62,23"/></svg>
+        </a>
+      </header>
+      <section class="gameArea">
+        <h1 class="sr-only">Puzzle</h1>
+        <div class="gameArea__gameWrapper">
+          <div id="gameContainer" class="gameArea__game"></div>
+          <div class="gameArea__dashboard">
+            <div class="timer">
+              <span class="timer__label">Time spent</span>
+              <div class="timer__time">
+                <span id="minute" class="timer__value timer__value--minutes">00</span>
+                <span class="unit">min</span>
+              </div>
+              <div class="timer__time">
+                <span id="seconds" class="timer__value timer__value--seconds">00</span>
+                <span class="unit">s</span>
+              </div>
+            </div>
+            <button id="startButton" class="gameArea__button">Start</button>
+          </div>
         </div>
-    </main>
-    <script src="/js/picture-puzzle.js"></script>
-    <script src="/js/main.js"></script>
+      </section>
+    </div>
+  </main>
+  <script src="/js/picture-puzzle.js"></script>
+  <script src="/js/main.js"></script>
 </body>
 </html>

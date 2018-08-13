@@ -2,13 +2,14 @@
 
 (function(global){
   
-  const duration = 200;
+  const duration = 150;
 
   let defaultOptions = {
     tileSize: 120,
     rows: 4,
     columns: 4,
     difficulty: 4,
+    scale: 0.996,
   };
 
   const inverseAxes = {
@@ -34,7 +35,7 @@
 
     gameInstance.tiles = [];
     gameInstance.isPlaying = false;
-    gameInstance.time = 1;
+    gameInstance.time = 0;
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);{};
@@ -63,7 +64,7 @@
 
   function addStyle(element, styleObject) {
     if (!element || element.nodeType !== 1) {
-      throw new Error(`addSstyle(${element}, ${styleObject}) failed.`);
+      throw new Error(`addStyle(${element}, ${styleObject}) failed.`);
     }
 
     for (let property in styleObject) {
@@ -71,6 +72,36 @@
         element.style[property] = styleObject[property]
       }
     }
+  }
+
+  function animateTiles(gameInstance) {
+    const { tiles, options } = gameInstance;
+    let times = 5;
+    const scaleValues = [options.scale, 0.5];
+    const rotatationValues = [0, -30];
+    const axes = ['y', 'x'];
+    const randomAxis = axes[Math.floor(Math.random() * 2)];
+
+    const id = setInterval(() => {
+      if (times === 0) {
+        clearInterval(id);
+      }
+
+      for (let i = 0; i < tiles.length; i++) {
+        const tile = tiles[i];
+        const x = tile.x * options.tileSize;
+        const y = tile.y * options.tileSize;
+        const translate = `translate(${x}px, ${y}px) scale(${scaleValues[times % scaleValues.length]})`;
+        const rotation = `rotate(${rotatationValues[(times * tile[randomAxis]) % rotatationValues.length]}deg)`;
+        const transform = `${translate} ${rotation}`;
+
+        addStyle(tile.tileElement, {
+          transform,
+        });
+      }
+
+      times--;
+    }, duration);
   }
 
   function createTiles(gameInstance) {
@@ -90,8 +121,9 @@
           position:`absolute`,
           left: '0',
           top:'0',
-          transform: `translate(${left}px, ${top}px)`,
+          transform: `translate(${left}px, ${top}px) scale(${options.scale})`,
           transition: `transform ${duration}ms linear`,
+          zIndex: 1,
         });
         
         if (!isEmpty) {
@@ -100,6 +132,7 @@
             backgroundRepeat: 'no-repeat',
             backgroundPosition: `-${left}px -${top}px`,
             backgroundSize: `auto ${options.columns * options.tileSize}px`,
+            zIndex: 2,
           });
         }
 
@@ -187,6 +220,7 @@
         solveEvent.time = gameInstance.time - 1;
         gameInstance.stage.dispatchEvent(solveEvent);
         gameInstance.isPlaying = false;
+        animateTiles(gameInstance);
       }
     }
   }
@@ -285,8 +319,8 @@
   function swapTiles(gameInstance, tile, tile2) {
     const { options } = gameInstance;
     // visual swapping (This must be done before logical swapping.)
-    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px)`;
-    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px)`;
+    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px) scale(${options.scale})`;
+    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px) scale(${options.scale})`;
     
     addStyle(tile.tileElement, {
       transform: tileTransform,
@@ -316,8 +350,7 @@
   }
 
   function moveRandomTile(gameInstance, excludedTile) {
-    const { tiles } = gameInstance;
-    const emptyTile = findEmptyTile(tiles);
+    const emptyTile = findEmptyTile(gameInstance.tiles);
     let tileCollection = findNeighbouringTiles(gameInstance, emptyTile);
 
     // remove excluded tile from collection
