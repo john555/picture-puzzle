@@ -137,7 +137,7 @@
         }
 
         if (options.image.preserve === 'height') {
-          backgroundSize = `auto ${options.columns * options.tileSize}px`;
+          backgroundSize = `auto ${options.rows * options.tileSize}px`;
           backgroundPosition = `-${left - options.image.offset}px -${top}px`;
         }
 
