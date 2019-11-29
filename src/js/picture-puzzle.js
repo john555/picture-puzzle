@@ -1,7 +1,6 @@
 'use strict';
 
-(function(global){
-  
+(function(global) {
   const duration = 150;
 
   let defaultOptions = {
@@ -13,7 +12,7 @@
     image: {
       preserve: 'width',
       offset: 0,
-    }
+    },
   };
 
   const inverseAxes = {
@@ -43,29 +42,38 @@
     gameInstance.isPlaying = false;
     gameInstance.time = 0;
 
-    if (userOptions.image.preserve && preserveWhiteList.indexOf(userOptions.image.preserve) < 0) {
-      throw new Error(`Invalid value '${userOptions.image.preserve}' for the option image.preserve`)
+    if (
+      userOptions.image.preserve &&
+      preserveWhiteList.indexOf(userOptions.image.preserve) < 0
+    ) {
+      throw new Error(
+        `Invalid value '${userOptions.image.preserve}' for the option image.preserve`,
+      );
     }
 
-    const imageOptions =  Object.assign({}, defaultOptions.image, userOptions.image)
+    const imageOptions = Object.assign(
+      {},
+      defaultOptions.image,
+      userOptions.image,
+    );
 
     // Override default options with user options
     gameInstance.options = Object.assign({}, defaultOptions, userOptions);
     gameInstance.options.image = imageOptions;
-    
+
     gameInstance.stage = createStage(gameInstance);
-    
+
     createTiles(gameInstance);
     renderTiles(gameInstance);
     bindEvents(gameInstance);
     // shuffleTiles(gameInstance);
     return gameInstance.stage;
-  };
+  }
 
   function createStage(gameInstance) {
     const { options } = gameInstance;
     const stageElem = document.createElement('div');
-  
+
     addStyle(stageElem, {
       position: 'relative',
       width: `${options.tileSize * options.columns}px`,
@@ -82,7 +90,7 @@
 
     for (let property in styleObject) {
       if (styleObject.hasOwnProperty(property)) {
-        element.style[property] = styleObject[property]
+        element.style[property] = styleObject[property];
       }
     }
   }
@@ -104,8 +112,12 @@
         const tile = tiles[i];
         const x = tile.x * options.tileSize;
         const y = tile.y * options.tileSize;
-        const translate = `translate(${x}px, ${y}px) scale(${scaleValues[times % scaleValues.length]})`;
-        const rotation = `rotate(${rotatationValues[(times * tile[randomAxis]) % rotatationValues.length]}deg)`;
+        const translate = `translate(${x}px, ${y}px) scale(${
+          scaleValues[times % scaleValues.length]
+        })`;
+        const rotation = `rotate(${
+          rotatationValues[(times * tile[randomAxis]) % rotatationValues.length]
+        }deg)`;
         const transform = `${translate} ${rotation}`;
 
         addStyle(tile.tileElement, {
@@ -126,12 +138,12 @@
         const tileElement = document.createElement('div');
         const left = x * options.tileSize;
         const top = y * options.tileSize;
-        const isEmpty = order === (options.rows * options.columns - 1);
-        
+        const isEmpty = order === options.rows * options.columns - 1;
+
         let backgroundSize = '';
         let backgroundPosition = '';
 
-        if(options.image.preserve === 'width') {
+        if (options.image.preserve === 'width') {
           backgroundSize = `${options.columns * options.tileSize}px auto`;
           backgroundPosition = `-${left}px -${top - options.image.offset}px`;
         }
@@ -143,15 +155,15 @@
 
         addStyle(tileElement, {
           width: `${options.tileSize}px`,
-          height:`${options.tileSize}px`,
-          position:`absolute`,
+          height: `${options.tileSize}px`,
+          position: `absolute`,
           left: '0',
-          top:'0',
+          top: '0',
           transform: `translate(${left}px, ${top}px) scale(${options.scale})`,
           transition: `transform ${duration}ms linear`,
           zIndex: 1,
         });
-        
+
         if (!isEmpty) {
           addStyle(tileElement, {
             backgroundImage: `url(${options.image.url})`,
@@ -174,16 +186,25 @@
         tiles.push(tile);
         order++;
       }
-    } 
+    }
   }
 
   function bindTileEvents(gameInstance, tile) {
-    tile.tileElement.addEventListener('click', onTileClick.bind({ gameInstance, tile }));
-    tile.tileElement.addEventListener('transitionend', onTransitionEnd(gameInstance));
+    tile.tileElement.addEventListener(
+      'click',
+      onTileClick.bind({ gameInstance, tile }),
+    );
+    tile.tileElement.addEventListener(
+      'transitionend',
+      onTransitionEnd(gameInstance),
+    );
   }
 
   function bindEvents(gameInstance) {
-    if (global.addEventListener && typeof global.addEventListener === 'function') {
+    if (
+      global.addEventListener &&
+      typeof global.addEventListener === 'function'
+    ) {
       global.addEventListener('keydown', onKeyDown.bind(null, gameInstance));
     }
   }
@@ -195,43 +216,59 @@
 
     const emptyTile = findEmptyTile(gameInstance.tiles);
 
-    switch(keyDirections[event.keyCode]) {
+    switch (keyDirections[event.keyCode]) {
       case 'top':
-        const topTile = findTileInPosition(gameInstance, emptyTile.x, emptyTile.y - 1);
+        const topTile = findTileInPosition(
+          gameInstance,
+          emptyTile.x,
+          emptyTile.y - 1,
+        );
 
         if (!topTile) {
           return;
         }
 
         swapTiles(gameInstance, topTile, emptyTile);
-      break;
+        break;
       case 'right':
-        const rightTile = findTileInPosition(gameInstance, emptyTile.x + 1, emptyTile.y);
+        const rightTile = findTileInPosition(
+          gameInstance,
+          emptyTile.x + 1,
+          emptyTile.y,
+        );
 
         if (!rightTile) {
           return;
         }
 
         swapTiles(gameInstance, rightTile, emptyTile);
-      break;
+        break;
       case 'bottom':
-        const bottomTile = findTileInPosition(gameInstance, emptyTile.x, emptyTile.y + 1);
-        
+        const bottomTile = findTileInPosition(
+          gameInstance,
+          emptyTile.x,
+          emptyTile.y + 1,
+        );
+
         if (!bottomTile) {
           return;
         }
 
         swapTiles(gameInstance, bottomTile, emptyTile);
-      break;
+        break;
       case 'left':
-        const leftTile = findTileInPosition(gameInstance, emptyTile.x - 1, emptyTile.y);
-        
+        const leftTile = findTileInPosition(
+          gameInstance,
+          emptyTile.x - 1,
+          emptyTile.y,
+        );
+
         if (!leftTile) {
           return;
         }
 
         swapTiles(gameInstance, leftTile, emptyTile);
-      break;
+        break;
     }
   }
 
@@ -241,14 +278,14 @@
         clearInterval(gameInstance.timer);
         const solveEvent = new Event('solve');
 
-        // Subtract 1 in order to match this time 
+        // Subtract 1 in order to match this time
         // with the value sent via the timeupdate event
         solveEvent.time = gameInstance.time - 1;
         gameInstance.stage.dispatchEvent(solveEvent);
         gameInstance.isPlaying = false;
         animateTiles(gameInstance);
       }
-    }
+    };
   }
 
   function onTileClick() {
@@ -270,10 +307,16 @@
     }
 
     const iAxis = inverseAxes[axis];
-    const startTile = (lastTile[iAxis] < emptyTile[iAxis]) ? lastTile : emptyTile;
-    const endTile = (lastTile[iAxis] < emptyTile[iAxis]) ? emptyTile : lastTile;
+    const startTile = lastTile[iAxis] < emptyTile[iAxis] ? lastTile : emptyTile;
+    const endTile = lastTile[iAxis] < emptyTile[iAxis] ? emptyTile : lastTile;
 
-    const movingTiles = getTilesInRange(gameInstance, emptyTile, startTile, endTile, axis);
+    const movingTiles = getTilesInRange(
+      gameInstance,
+      emptyTile,
+      startTile,
+      endTile,
+      axis,
+    );
 
     moveManyTiles(gameInstance, movingTiles, iAxis);
   }
@@ -289,7 +332,7 @@
     if (firstTile.isEmpty) {
       // move first tile to the end
       for (let i = 1; i < tiles.length; i++) {
-        swapTiles(gameInstance, firstTile, tiles[i])
+        swapTiles(gameInstance, firstTile, tiles[i]);
       }
       return;
     }
@@ -309,11 +352,11 @@
     const { tiles } = gameInstance;
 
     const iAxis = inverseAxes[axis];
-    
+
     const range = tiles.filter(tile => {
-      
-      const isInRange = (tile[iAxis] >= startTile[iAxis]) && (tile[iAxis] <= endTile[iAxis]);
-      return isInRange && (tile[axis] === emptyTile[axis]);
+      const isInRange =
+        tile[iAxis] >= startTile[iAxis] && tile[iAxis] <= endTile[iAxis];
+      return isInRange && tile[axis] === emptyTile[axis];
     });
 
     return range.sort((a, b) => a[iAxis] > b[iAxis]);
@@ -323,7 +366,7 @@
     if (tile1.x === tile2.x) {
       return 'x';
     }
-    
+
     if (tile1.y === tile2.y) {
       return 'y';
     }
@@ -339,15 +382,23 @@
   }
 
   function findEmptyTile(tiletileCollection) {
-    return tiletileCollection.filter(tile => (tile && tile.isEmpty) === true)[0];
+    return tiletileCollection.filter(
+      tile => (tile && tile.isEmpty) === true,
+    )[0];
   }
 
   function swapTiles(gameInstance, tile, tile2) {
     const { options } = gameInstance;
     // visual swapping (This must be done before logical swapping.)
-    const tileTransform = `translate(${tile2.x * options.tileSize}px, ${tile2.y * options.tileSize}px) scale(${options.scale})`;
-    const emptyTileTransform = `translate(${tile.x * options.tileSize}px, ${tile.y * options.tileSize}px) scale(${options.scale})`;
-    
+    const tileTransform = `translate(${tile2.x *
+      options.tileSize}px, ${tile2.y * options.tileSize}px) scale(${
+      options.scale
+    })`;
+    const emptyTileTransform = `translate(${tile.x *
+      options.tileSize}px, ${tile.y * options.tileSize}px) scale(${
+      options.scale
+    })`;
+
     addStyle(tile.tileElement, {
       transform: tileTransform,
     });
@@ -371,7 +422,7 @@
     const { tiles } = gameInstance;
     const matches = tiles.filter(tile => {
       return tile.x === px && tile.y === py;
-    })
+    });
     return matches[0];
   }
 
@@ -418,7 +469,7 @@
     if (!this || this === global) {
       return new PicturePuzzle(options);
     }
-    
+
     init(this, options);
   }
 
@@ -438,7 +489,7 @@
 
       this.stage.dispatchEvent(new Event('start'));
     });
-  }
+  };
 
   PicturePuzzle.prototype.isSolved = function() {
     const { tiles } = this;
@@ -458,7 +509,9 @@
     const { options } = this;
 
     return new Promise(resolve => {
-      let times = Math.floor(Math.abs(options.difficulty * options.columns * options.columns));
+      let times = Math.floor(
+        Math.abs(options.difficulty * options.columns * options.columns),
+      );
       let excludedTile;
 
       const intervalId = setInterval(() => {
@@ -490,5 +543,4 @@
 
   // export game object
   global.PicturePuzzle = PicturePuzzle;
-
 })(window);

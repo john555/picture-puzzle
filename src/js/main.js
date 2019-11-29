@@ -22,10 +22,11 @@ const gameOptions = {
   rows,
   // difficulty: 0.08,
   image: {
-    url: 'https://images.pexels.com/photos/1307662/pexels-photo-1307662.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+    url:
+      'https://images.pexels.com/photos/1307662/pexels-photo-1307662.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
     preserve: 'height',
     offset: -50,
-  }
+  },
 };
 
 const puzzle = new PicturePuzzle(gameOptions);
@@ -39,8 +40,8 @@ function formatTime(seconds) {
   let m = Math.floor(seconds / 60);
   let s = seconds % 60;
 
-  m = (m < 10) ? `0${m}` : m;
-  s = (s < 10) ? `0${s}` : s;
+  m = m < 10 ? `0${m}` : m;
+  s = s < 10 ? `0${s}` : s;
   return {
     minutes: m,
     seconds: s,
