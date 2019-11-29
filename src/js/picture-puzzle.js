@@ -359,7 +359,9 @@
       return isInRange && tile[axis] === emptyTile[axis];
     });
 
-    return range.sort((a, b) => a[iAxis] > b[iAxis]);
+    return range.sort((a, b) =>
+      a[iAxis] > b[iAxis] ? -1 : a[iAxis] < b[iAxis] ? 1 : 0,
+    );
   }
 
   function getMatchingAxis(tile1, tile2) {
