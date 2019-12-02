@@ -512,7 +512,7 @@
 
     return new Promise(resolve => {
       let times = Math.floor(
-        Math.abs(options.difficulty * options.columns * options.columns),
+        Math.abs(options.difficulty * options.rows * options.columns),
       );
       let excludedTile;
 
