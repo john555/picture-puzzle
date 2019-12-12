@@ -162,7 +162,6 @@
             return document.getElementById(id);
           };
 
-          const gameContainer = select('gameContainer');
           const startButton = select('startButton');
           const minute = select('minute');
           const seconds = select('seconds');
@@ -187,6 +186,7 @@
           };
 
           const puzzle = new Puzzle(gameOptions);
+          puzzle.render('gameContainer');
 
           startButton.addEventListener('click', () => {
             puzzle.start();
@@ -217,8 +217,6 @@
               bestTime = event.time;
             }
           });
-
-          gameContainer.appendChild(puzzle.stage);
         });
       })();
     </script>

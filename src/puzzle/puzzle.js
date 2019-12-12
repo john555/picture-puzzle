@@ -1,4 +1,5 @@
 import { init } from './init';
+import { render } from './render';
 import { start } from './start';
 import { isSolved } from './isSolved';
 import { shuffle } from './shuffle';
@@ -16,6 +17,7 @@ export function Puzzle(options) {
   init(this, options);
 }
 
+Puzzle.prototype.render = render;
 Puzzle.prototype.start = start;
 Puzzle.prototype.isSolved = isSolved;
 Puzzle.prototype.shuffle = shuffle;
