@@ -4,8 +4,8 @@
   "description": "",
   "main": "gulpfile.js",
   "scripts": {
-    "start": "webpack",
-    "dev": "NODE_ENV=development webpack-dev-server --open",
+    "build": "webpack",
+    "start": "NODE_ENV=development webpack-dev-server --open",
     "babel": "babel -f ./src/index.js"
   },
   "author": "John O. Paul",
