@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Puzzle by John O. Paul</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        font-size: 62.5%;
+      }
+
+      body {
+        font-size: 1.6rem;
+        font-family: 'Roboto', sans-serif;
+        background: #f5f5f5;
+        color: #555;
+        margin: 0;
+      }
+
+      .container {
+        max-width: 96rem;
+        width: 90%;
+        margin: 0 auto;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
+
+      /* .mainHeader */
+
+      .mainHeader {
+        background: white;
+        display: flex;
+        padding: 1rem 3rem;
+        box-shadow: 0 0.1rem 1.4rem rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .mainHeader__appName {
+        margin: 0;
+        font-weight: normal;
+        font-size: 2.6rem;
+      }
+
+      .twitterLink {
+        display: block;
+        height: 3.6rem;
+        box-sizing: content-box;
+        padding: 1rem;
+        svg {
+          height: 100%;
+        }
+      }
+
+      /* .gameArea */
+
+      .gameArea {
+        margin-top: 3rem;
+        overflow: hidden;
+      }
+
+      .gameArea__gameWrapper {
+        background: white;
+        min-height: 23rem;
+        display: flex;
+        justify-content: space-between;
+        border-radius: 5px;
+      }
+
+      .gameArea__game {
+        flex: 0 0 calc(100% - 23rem);
+      }
+
+      .gameArea__dashboard {
+        position: relative;
+        flex: 0 0 23rem;
+        padding: 8% 2rem 2rem 4rem;
+        height: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .gameArea__button {
+        width: 100%;
+        background: #bada55;
+        padding: 2rem;
+        border: 1px solid #eee;
+        color: #000;
+        border-radius: 0.5rem;
+        font: inherit;
+        margin-top: 30px;
+      }
+
+      /* .timer */
+
+      .timer {
+        padding: 1rem;
+      }
+
+      .timer__label {
+        display: block;
+        margin-bottom: 2rem;
+      }
+
+      .timer__value--minutes {
+        font-size: 4rem;
+      }
+
+      .timer__value--seconds {
+        font-size: 6rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="container">
+        <section class="gameArea">
+          <h1 class="sr-only">Puzzle</h1>
+          <div class="gameArea__gameWrapper">
+            <div id="gameContainer" class="gameArea__game"></div>
+            <div class="gameArea__dashboard">
+              <div class="timer">
+                <span class="timer__label">Time spent</span>
+                <div class="timer__time">
+                  <span id="minute" class="timer__value timer__value--minutes"
+                    >00</span
+                  >
+                  <span class="unit">min</span>
+                </div>
+                <div class="timer__time">
+                  <span id="seconds" class="timer__value timer__value--seconds"
+                    >00</span
+                  >
+                  <span class="unit">s</span>
+                </div>
+              </div>
+              <button id="startButton" class="gameArea__button">Start</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <script>
+      (function() {
+        window.addEventListener('DOMContentLoaded', () => {
+          const select = function(id) {
+            return document.getElementById(id);
+          };
+
+          const startButton = select('startButton');
+          const minute = select('minute');
+          const seconds = select('seconds');
+
+          let bestTime = 0;
+
+          const { width } = gameContainer.getBoundingClientRect();
+          const columns = 4;
+          const rows = 4;
+          const tileSize = Math.round(width / columns);
+
+          const gameOptions = {
+            tileSize,
+            columns,
+            rows,
+            image: {
+              url:
+                'https://images.pexels.com/photos/1307662/pexels-photo-1307662.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+              preserve: 'height',
+              offset: -50,
+            },
+          };
+
+          const puzzle = new Puzzle(gameOptions);
+          puzzle.render('gameContainer');
+
+          startButton.addEventListener('click', () => {
+            puzzle.start();
+            startButton.style.visibility = 'hidden';
+          });
+
+          function formatTime(seconds) {
+            let m = Math.floor(seconds / 60);
+            let s = seconds % 60;
+
+            m = m < 10 ? '0' + m : m;
+            s = s < 10 ? '0' + s : s;
+            return {
+              minutes: m,
+              seconds: s,
+            };
+          }
+
+          puzzle.onTimeUpdate(function(event) {
+            const time = formatTime(event.time);
+            minute.innerText = time.minutes;
+            seconds.innerText = time.seconds;
+          });
+
+          puzzle.onSolve(function(event) {
+            startButton.style.visibility = 'visible';
+            if (event.time < bestTime) {
+              bestTime = event.time;
+            }
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
