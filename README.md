@@ -22,28 +22,28 @@ cd picture-puzzle
 Run the app.
 
 ```
-$ yarn dev
+$ yarn start
 ```
 
 Or
 
 ```
-$ npm run dev
+$ npm start # or npm run start
 ```
 
 ## Documentation.
 
-In order to integrate the game to your website or web app, include the `picture-puzzle.js` file in your HTML document.
+In order to integrate the game to your website or web app, include the `dist/puzzle.js` file in your HTML document.
 
 ```html
 <div id="game"></div>
-<script src="/path/to/picture-puzzle.js"></script>
+<script src="/path/to/dist/puzzle.js"></script>
 ```
 
 Create the game.
 
 ```js
-const game = new PicturePuzzle({
+const game = new Puzzle({
   tileSize: 100, // width and height of the tile
   columns: 4,
   rows: 4,
